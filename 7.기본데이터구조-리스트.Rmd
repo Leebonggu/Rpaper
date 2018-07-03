@@ -1,0 +1,62 @@
+---
+title: "7.기본데이터구조-리스트"
+author: "Bongus"
+date: '2018 7 3 '
+output: html_document
+---
+
+## 리스트(list)
+R에서 리스트는 다른 프로그래밍언어의 해시테이블([해시태이블](https://ko.wikipedia.org/wiki/%ED%95%B4%EC%8B%9C_%ED%85%8C%EC%9D%B4%EB%B8%94)) 또는 딕셔너리([딕셔너리](https://ko.wikipedia.org/wiki/%EB%8D%B0%EC%9D%B4%ED%84%B0_%EC%82%AC%EC%A0%84))와 비슷하다. 리스트는 (key, value)의 형태의 데이터구조이며, 연관 배열이라고도 부른다.
+
+### 리스트 생성
+리스트는 `list()`함수를 사용해서 생성한다. 
+```
+list(
+  key1=value1,
+  key2=value2
+)
+```
+```{R}
+listData <- list(name="bonggu", looks=c("handsome", "pretty"))
+print(listData)
+
+# 리스트 안에 리스트도 가능하다. 
+listData2 <- list(human=list(name="bonggu", armNumber=2), animal=list(name="bonggu",armNumber=4))
+print(listData2)
+```
+
+### 리스트 데이터 접근
+리스트에 저장된 데이터는 색인이나 키값을 사용해서 접근할 수 있다.
+
+접근방법 | 기능
+-----|---------
+data[key] | 리스트형 data에서 key값에 해당하는 value
+data[n] | 리스트형 data에서 n번째 데이터의 서브리스트
+data[[n]] | 리스트형 data에서 n번째 저장된 값
+
+```{R}
+# 1.
+print(listData)
+print(listData$name)
+print(listData$looks)
+print(listData['name']) #문자열로 접근해야 한다. == print(listData[1])
+print(listData['looks']) # == print(listData[2])
+print(listData[[1]])
+print(listData[[2]])
+
+# 2.
+print(listData2)
+print(listData2$human)
+print(listData2$human$name)
+print(listData2["animal"]) # == print(listData2[1])
+print(listData2[1])
+print(listData2[[1]])
+print(listData2[[1]][1])
+```
+  
+  
+리스트는 같은 특징을 가진 데이터를 모아서 정리할 때 유용한 데이터 구조입니다. R에서 기본 데이터 구조에 속하니 알아두시기 바랍니다. 다음 시간에는 메트릭스(행렬)에 대해서 배우도록 하겠습니다. 메트릭스는 벡터에서 배운 데이터 접근 방식을 유사하게 사용합니다. 메트릭스로 넘어가기 전에 벡터를 한번 더 학습하고 오시는 것을 추천드립니다!
+  
+  
+  
+---
