@@ -1,0 +1,123 @@
+---
+title: "2.기초-조건문"
+author: "Bongus"
+date: '2018 6 27 '
+output: html_document
+---
+
+## 조건문(conditional statement)
+조건문은 조건을 주고, 그 조건에 따라 프로그램의 흐름을 제어하는 구문을 말합니다. 조금 더 간단히 말하면 특정 조건이 맞으면 실행되는 구문이라고 생각하면 됩니다. R에서 쓰는 대표적인 조건문으로 `if문`이 있습니다.
+
+### 논리연산자(logical operator)
+논리연산자는 and, or, not을 통해 TRUE, FALSE를 구별하는데 사용됩니다. 조건문을 사용할 때 자주 사용하는 개념이니 미리 공부하고 가도록 합시다.
+
+논리연산자 | 기능
+-------|----------
+`!` | not (!TRUE = FALSE)
+`&` | and (벡터 전체 결과 고려)
+`&&` | and(벡터 첫 번째 결과 고려)
+`|` | or (벡터 전체 결과 고려)
+`||` | or (벡터 첫 번쨰 결과 고려)
+
+### if statement  
+```
+case 1.
+if(조건문) {
+  조건문이 TRUE일 경우 실행
+} else {
+  조건문이 FALSE일 경우 실행
+}
+
+case 2.
+if(조건문1) {
+  조건문1이 TRUE일 경우 실행
+} else if (조건문2) {
+  조건문1이 FALSE, 조건문2가 TRUE면 실행
+} else {
+  조건문1, 조건문2가 FALSE일 경우실행
+}
+```
+
+```{R}
+# case 1.
+condition1 <- TRUE
+
+if(condition1) {
+  print("condition1이 참입니다") # print()는 데이터 결과를 출력하는 함수입니다. 
+} else {
+  print("condition1이 거짓입니다")
+}
+
+if(!condition1) {
+  #!은 not이라는 뜻입니다. 따라서 !TRUE => FALSE.
+  print("condition1이 참입니다")
+} else {
+  print("condition1이 거짓입니다")
+}
+```
+```{R}
+# case 2.
+condition1 <- TRUE
+condition2 <- TRUE
+
+if(condition1) {
+  print("condition1이 참입니다")
+} else if(condition2){
+  print("conditio2")
+} else {
+  print("else")
+}
+
+if(!condition1) {
+  print("condition 거짓")
+} else if(condition2){
+  print("conditio2 참")
+} else {
+  print("else")
+}
+
+if(!condition1) {
+  print("condition 거짓")
+} else if(!condition2){
+  print("conditio2 거짓")
+} else {
+  print("condition1,2 모두 거짓일때 else가 실행됩니다.")
+}
+```
+
+### ifelse() 함수
+`ifelse()`함수는 if,else 구문을 쉽게 사용하기 위해 만들어진 함수입니다. `ifelse()`를 사용하면 다수의 데이터에 한번에 if문을 적용할 수 있습니다. 
+
+```
+ifelse(조건, 조건이 참일 때 선택 값, 조건이 거짓일 때 선택 값)
+```
+```{R}
+ifelseTest1 <- ifelse(5 > 4, "5는 4보다 크다", "4는 5보다 작다")
+ifelseTest1 # 5 > 4가 TRUE이기 때문에 앞의 문장이 실행되었습니다.
+
+ifelseTest2 <- ifelse(5 < 4, "5는 4보다 크다", "4는 5보다 작다")
+ifelseTest2# 5 < 4가 FALSE이기 때문에 뒤의 문장이 실행되었습니다.
+```
+  아래 코드는 ifelse 함수를 다수의 데이터에 적용한 경우입니다. `%%`는 모듈로라는 연산자입니다. `a %% b`이면 a를 b로 나눈 값의 나머지를 반환하는 연산자입니다. 
+```{R}
+number <- c(1,2,3,4,5)
+ifelse(number %% 2 == 0, "Even", "Odds")
+```
+  
+`ifelse()`를 중첩해서 사용할 수 있습니다. 중첩해서 사용하면 더 다양하고, 복잡한 구조를 만들 수 있습니다. 아래 코드는 ifelse 함수를 중첩해서 사용한 경우입니다. 조건에 맞지 않을 경우에 다시 ifelse사용해서 꼬리에 꼬리를 물며 이어지고 있습니다. (조금 복잡해보이죠?)
+```{R}
+test <- 10
+ifelse(test < 5, "test는 5보다 작습니다", 
+       ifelse(test < 7, "test는 7보다 작습니다",
+              ifelse(test < 9, "test는 9보다 작습니다",
+                     ifelse(test < 11, "test는 11보다 작습니다", "그 외는 고려하지 않습니다."))))
+
+```
+
+### 마무리
+오늘은 R의 조건문에 대해서 배웠습니다. switch라는 조건문도 있으나 if에 비하면 많이 사용하지 않는 편입니다. 궁금하시다면 따로 공부하시는 것을 추천드립니다. 조건문은 언어마다 사용법은 다르지만 모든 프로그래밍언어에 기본적으로 있는 개념이니 꼼꼼히 공부하시기 바랍니다. 다음 시간에는 반복문에 대해서 공부하도록 하겠습니다.
+  
+  
+  ---
+
+

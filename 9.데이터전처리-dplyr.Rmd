@@ -1,0 +1,191 @@
+---
+title: "9.데이터전처리"
+author: "Bongus"
+date: '2018 8 6 '
+output: html_document
+---
+
+## 데이터전처리 = 데이터 가공
+
+주어진 데이터를 그대로 사용하기보다는 원하는 형탤 변형해 분석하는 경우가 많습니다. 데이터를 분석에 적합한 형태로 가공하는 작업을 `데이터 전처리 Data Preprocessing`라고 합니다. 데이터의 일부를 나누거나, 여러 데이터를 합치는 등  데이터를 자유롭게 가공할 수 있어야 내 목적에 맞는 데이터 분석이 가능합니다( 데이터 가공, 데이터 핸들링, 데이터 랭글링, 데이터 멍잉도 데이터 전처리와 비슷한 의미로 사용됩니다). 
+
+통계학자 hadley wickham이 만든 `dplyr`패키지는 데이터 전처리 작업에서 가장 많이 사용되는 패키지입니다. dplyr을 구성하는 함수들 입니다(125페이지).
+
+함수|기능
+----|----
+filter() | 행 추출
+select() | 열(변수) 추출
+arrange() | 정렬
+mutate() | 변수 추가(열 추가)
+summarise() | 통계치 산출
+group_by() | 집단별로 나누기
+left_join() | 데이터 합치기(열)
+bind_rows() | 데이터 합치기(헁)
+
+### 1. 조건에 맞는 데이터 추출 - filter()
+데이터를 분석할 때 전체를 분석하기도 하지만 필요한 것들만 추출해서 분석하기도 합니다. dplyr의 filter()함수를 사용하면 필요한 일부 데이터만 추출할 수 있습니다. 
+
+```{R}
+# 1.
+# dplyr 패키지 사용
+library(dplyr)
+
+# csv_exam.csv 파일 불러오기
+exam <- read.csv('csv_exam.csv')
+exam
+
+# 2.
+# dplyr의 filter()를 사용해 특정 데이터만 추출
+exam %>% filter(class == 1) # class가 1인 데이터만 뽑기
+exam %>% filter(class == 3) # class가 1인 데이터만 뽑기
+exam %>% filter(class != 3) # class가 3이 아닌 데이터만 뽑기
+```
+```
+dplyr 패키지는 %>% 기호를 이용해 함수들을 나열하는 방식으로 코드를 작성합니다. %>%는 파이프연산자라고 읽고 ctrl + shift + M (command + shift + M )키를 누르면 삽입이 된다. R에서 기본으로 제공하는 기능은 아니지만 magrittr라는 패키지에서 만들어졌고, dplyr에서 자주 사용하는 기능입니다. 쉽게보자면 **A %>% B** A데이터가 B함수의 데이터로 사용된다고 생각하면 됩니다. 그렇게 A %>% B %>% C %>% D ... 각 이전의 결과값 데이터들이 다음 함수의 데이터로 사용되는 구조입니다. 
+```
+  
+부등호를 이용해서 값을 뽑아낼 수도 있습니다.
+  
+```{R}
+exam %>% filter(math > 60 ) #수학 60점 초과하는 데이터만 뽑기
+exam %>% filter(science >= 90) #과학 90점 이상인 데이터만 뽑기
+```
+  
+여러 조건을 통해 데이터를 뽑을 수도 있습니다.
+```{R}
+exam %>% filter(math > 60 & english > 80 ) #수학 60점 초과, 영어 80점 초과하는 데이터만 뽑기
+exam %>% filter(science > 50 & science <= 70) #과학 50점 초과 70점 이하의 뎅니터만 뽑기
+exam %>% filter(science > 50 | math < 70) #과학이 50점을 초과하거나 수학이 70점 미만인 데이터 뽑기
+exam %>% filter(class == 1 | class == 5) #1반이거나 5반인 데이터 쁍기
+exam %>% filter(class %in% c(1,5)) #위와 같은 결과로 %in%기호는 변수의 값이 지정한 조건 목록에 해당하는지 확인 하는 기능
+```
+
+filter로 추출한 데이터를 새로운 변수로 만들 수 있습니다. 
+```{R}
+class1 <- exam %>%  filter(class == 1)
+print(class1)
+summary(class1$math)
+```
+
+### 2. 필요한 변수만 추출 - select()
+select()함수를 사용하면 전체 데이터에서 일부 변수만 가져와서 사용할 수 있습니다. 
+```{R}
+exam # 원본
+exam %>% select(math) # math만 추출
+exam %>% select(english) # english 추출
+exam %>% select(class, math, english) # class, math, english만 추출
+exam %>% select(-math) # -를 붙이면 math만 빼고 추출할 수 있습니다. 
+exam %>% select(-math,-english) # -를 붙이면 math,english만 빼고 추출할 수 있습니다. 
+```
+
+앞에서 배운 filter와 select를 같이 사용하면 더 자유롭게 데이터 가공이 가능합니다. dplyr 패키지는 %>%를 이앵해 함수를 조합할 수 있다는 장점이 있습니다.
+
+```{R}
+exam %>% filter(class == 1) %>% select(math) # 1반의 수학성적만 뽑기
+```
+가독성 높은 코드를 위해서는 %>% 뒤에서 엔터(enter)를 통해 함수를 구분해 줍니다. 
+```{R}
+exam %>% 
+  filter(class == 1) %>% 
+  select(math) 
+  # 1반의 수학성적만 뽑기
+```
+함수 마지막을 %>% head로 마무리하면 데이터의 앞부분 일부만 출력해서 볼 수 있습니다. 기존에 사용하던 head()와 같은 기능입니다. 
+```{R}
+exam %>% filter(math > 50) %>% head # 수학 50점 초과인 데이터의 일부만 확인하기
+```
+
+### 3. 순서대로 정렬하기 - arrange()
+arrange() 함수를 사용하면 데이터를 원하는 순서로 정렬이 가능합니다. arrange()에 정렬을 기준으로 삼을 변수명을 입력하면 그 변수를 기준으로 데이터가 정렬됩니다.
+```{R}
+exam %>% arrange(math) #math를 기준으로 오름차순 정렬 / 기본값은 오름 차순입니다. 
+exam %>% arrange(desc(math)) #desc()를 사용하면 내림차순으로 데이터가 정렬됩니다.  
+```
+arrange()에 기준으로 삼을 변수를 여러개 지정할 수도 있습니다.여러개의 변수를 지정할 경우 먼저 앞에오는 변수를 기준으로 정렬되고, 첫 번째 변수 안에서 다음 변수를 기준으로 정렬된다. 예시를 통해 한번 보면...
+```{R}
+exam %>% arrange(class, math) #먼저 반을 기준으로 데이터가 정렬되고, 그 반 안에서 math데이터가 정려됨을 확인할 수 있다.
+```
+
+### 4. 파생변수 추가하기 - mutate()
+mutate()를 사용하면 기준 데이터에 파생변수를 만들어 추가할 수 있습니다. 파생변수는 기존에 있던 데이터를 가공해 새롭게 만든 데이터를 의미합니다. `mutate( 변수명 = 공식)`을 통해 새로운 파생변수를 만들 수 있습니다. 
+```{R}
+exam %>% 
+  mutate(total = math + english + science) %>% 
+  head
+```
+total이라는 변수명이 추가된 것을 확인할 수 있습니다. 또한 쉼표를 통해 이어서 또 다른 파생변수를 입력하면 여러 파생변수를 추가할 수도 있습니다. 
+```{R}
+exam %>% 
+  mutate(total = math + english + science,
+         mean = (math + english + science)/3) %>% 
+  head
+```
+mutate()에 ifelse()를 적용하면 조건에 따라 다른 값을 부여한 변수를 추가할 수 있습니다. 
+```{R}
+exam %>% 
+  mutate(test = ifelse(science >= 60, "패쓰", "탈락")) %>% 
+  head
+```
+앞에서 배운 arrange()함수를 같이 사용하면 파생변수를 만들고, 그 파생변수를 기준으로 데이터를 정렬할 수 있습니다.
+```{R}
+#오름차순 정렬
+exam %>% 
+  mutate(total = math + english + science) %>% 
+  arrange(total) 
+```
+### 5. 집단별로 데이터 요약하기 - group_by(), summarise()
+데이터에서 집단별 평균이나, 각 집단을 요약한 값을 구하고 싶을 때 group_by(), summarise()함수를 사용합니다. 이 함수들을 사용하면 집단간의 데이터를 쉽게 비교할 수 있습니다. 
+  
+summarise()를 사용하면 데이터를 하나의 값으로 요약할 수 있습니다.
+```{R}
+exam %>% summarise(mean_math = mean(math))
+```
+group_by()에 변수를 지정하면 변수 항목별로 데이터를 분리합니다. 여기에 summarise()를 사용하면 집단별 통계량을 산출할 수 있습니다. 아럐 코드는 데이터를 클래스로 나누고, 그 클래의 수학 평균을 구하고 있습니다. 
+```{R}
+exam %>% 
+  group_by(class) %>% 
+  summarise(mean_math = mean(math))
+```
+summarise() 역시 여러 통계량을 한번에 산출할 수 있습니다. 
+```{R}
+exam %>% 
+  group_by(class) %>% 
+  summarise(mean_math = mean(math),
+            sum_math = sum(math),
+            median_math = median(math),
+            n =n()) # 행의 개수를 세는 것
+```
+### 6. 데이터 합치기 - left_join(), bind_rows()
+데이터 분석을 할 때 여러 데이터를 하나의 데이터로 만든 후 분석하기도 합니다. 예를들어 중간고사와 기말고사 데이터를 합처 하나의 시험 점수 데이터를 만들어 분석할 수 있습니다. 데이터를 합치는 방법은 크게 2가지가 있는데 가로로 데이터를 합치거나 세로로 데이터를 합치는 방법이 있습니다. 
+  
+#### 가로로 합치기
+```{R}
+test1 <- data.frame(id = c(1,2,3,4,5), midterm = c(60,70,80,70,80))
+test2 <- data.frame(id = c(1,2,3,4,5), final = c(50,60,90,60,90))
+```
+dplyr 패키지의 left_join()을 이용하면 데이터를 가로로 합칠 수 있습니다. 괄호 안에 합칠 데이터 프레임명을 나열하고, 기준으로 삼을 변수명을 by에 지정하면 됩니다. by에 기준변수 이름을 넣을 때는 "문자열"로 넣어야 합니다. 
+```{R}
+total <- left_join(test1, test2, by = "id")
+total
+```
+left_join()을 사용ㄴ하면 특정 변수의 값을 기준으로 다른 데이터의 값을 추가할 수 있습니다. 예를들어 지역 번호가 들어 있는 데이터를 분석할 경우 어떤 지역인지 알 수 있도록 지역 이름을 추가해야할 때가 있는데, 이럴 때 지역 번호별 지역 이름을 나타낸 데이터기 있다면 분석 중인 데이터에 지역 이름을 추가할 수 있습니다. 
+ 
+```{R}
+name <- data.frame(class=c(1,2,3,4,5), teacher=c("kim","park","choi","jung","lee"))
+exam_new <- left_join(exam, name, by="class")
+exam_new
+```
+#### 세로로 합치기
+세로로 데이터를 합치는 방법 역시 가로로 합치는 것과 유사합니다. 세로로 데이터를 합치기 위해서는 bind_rows()함수를 사용합니다. 
+```{R}
+group_a <- data.frame(id = c(1,2,3,4,5), test=c(60,70,80,90,100))
+group_b <- data.frame(id = c(6,7,8,9,10), test=c(100,20,30,40,50))
+group_all <- bind_rows(group_a, group_b)
+group_all
+```
+데이터를 세로로 합칠 때는 두 데이터의 변수명이 같이야 합니다(열 이름이 같이야 합니다). group_a, group_b의 변수 이름이 id, test로 동일하기 때문에 세로로 합칠 수 있었습니다. 만약 다르다면 rename()함수를 통해 이름을 동일하게 맞춘 후 사용하면 됩니다. 
+  
+이번 시간에는 데이터 전처리에 대해서 배웠습니다. 데이터 사이언스에서 데이터 전처리를 많이 비중을 차지합니다. 사실 데이터 사이언스는 데이터 가공의 연속이라고 봐야합니다. 가공후 확인하고, 또 다시 가공하고 확인하는 작업의 연속입니다. 때문에 데이터 가공은 고통스럽고 시간이 많이 걸리는 작업입니다. 하지만 좋은 인사이트를 얻기 위해서는 반드시 거쳐야 하는 과정입니다. 이번장에서는 dplyr패키지만 다루었지만 이것이 다가 아닙니다.  데이터 전처리를 위해 사용되는 함수는 수 없이 많이 있다는 것을 잊으면 안됩니다.
+
+
+---
